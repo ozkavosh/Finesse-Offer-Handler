@@ -10,7 +10,9 @@ app.get('/', function(request, response) {
 app.listen(3000, () => console.log(`FUNCIONAMIENTO CORRECTO`));
 
 //----------------------------- SISTEMA 24/7 -----------------------------//
-//Prueba de git
+
+/*Segunda prueba de git =D*/
+
 const Discord = require('discord.js');
 const { token } = require('./config.json');
 

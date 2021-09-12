@@ -13,13 +13,13 @@ module.exports = (Discord, client, MessageReaction, User) => {
 
         if(partes[8]){
             switch(partes[9]){
-                case 'dps': partes[9] = `<:dps:884119963571458068>DPS`;
+                case 'dps': partes[9] = `<:dps:884119963571458068>`;  partes[10] = 'DPS';
                         break;
-                    case 'heal': partes[9] = `<:heal:884119949776420895>HEAL`;
+                    case 'heal': partes[9] = `<:heal:884119949776420895>HEAL`; partes[10] = 'HEAL';
                         break;
-                    case 'tank': partes[9] = `<:tank:884119949512175647>TANK`;
+                    case 'tank': partes[9] = `<:tank:884119949512175647>TANK`; partes[10] = 'TANK';
                         break;
-                    case 'chest1': partes[9] = `<:chest1:884474242605908090>FUNNEL`;
+                    case 'chest1': partes[9] = `<:chest1:884474242605908090>FUNNEL`; partes[10] = 'FUNNEL';
                         break;
             }
         }

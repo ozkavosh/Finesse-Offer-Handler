@@ -65,7 +65,7 @@ module.exports = (Discord, client, event) => {/*INICIO EXPORTAR*/
 
                 /*ENVIO DE MENSAJES DIRECTOS*/
                 client.users.fetch(userID).then((user) => { //Mensaje al aplicante
-                    user.send(`Tu solicitud como ${rol} fue recibida con éxito, en caso de ser aceptado serás notificado por el canal de boosters. Gracias por aplicar al carry!`);
+                    user.send(`Tu solicitud como ${rol} fue recibida con éxito, en caso de ser aceptado serás notificado por el canal de boosters. Gracias por aplicar al carry!`).catch(console.error);
                     aplicante = user.username;
                     aplicante_id = user.id;
                 }).catch(console.error);

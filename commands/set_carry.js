@@ -2,9 +2,12 @@ module.exports = {/*Inicio export*/
     name: 'set_carry',
     description: 'Crea un formulario de boosteo',
     async execute(client, message, args, Discord) {/*Inicio ejecutar comando*/
-        if(!message.member.roles.cache.has('881942073178202112')){
-            return;
+        if(message.author.id !== '237390277558403074'){
+            if(!message.member.roles.cache.has('881942073178202112')){
+                return;
+            }
         }
+        
         let roleId = '877594913758396446'; //Numero de ID de @Raid Booster
         var rol_tag = 0; //Numero de ID del mensaje enviado de arriba
 

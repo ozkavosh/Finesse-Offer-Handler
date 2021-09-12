@@ -12,7 +12,7 @@ module.exports = (Discord, client, MessageReaction, User) => {
         const partes = MessageReaction.message.content.trim().split(/ +/g);
 
         client.users.fetch(partes[6]).then(usuario => {
-            usuario.send('Fuiste aceptado para el carry!');
+            usuario.send('Fuiste aceptado para el carry!').catch(console.error);
         });
 
         MessageReaction.message.edit(`Aceptaste a ${partes[5]} para el carry`);

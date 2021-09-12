@@ -25,7 +25,7 @@ module.exports = (Discord, client, MessageReaction, User) => {
         }
 
         client.users.fetch(partes[6]).then(usuario => {
-            usuario.send(`Fuiste aceptado para el carry ! Tu rol es: ${partes[9]}`}).catch(console.error);
+            usuario.send(`Fuiste aceptado para el carry ! Tu rol es: ${partes[9]}`).catch(console.error);
         });
 
         MessageReaction.message.edit(`Aceptaste a ${partes[5]} para el carry`).catch(console.error);

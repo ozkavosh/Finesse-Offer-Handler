@@ -15,7 +15,7 @@ module.exports = (Discord, client, MessageReaction, User) => {
             usuario.send('Fuiste aceptado para el carry!').catch(console.error);
         });
 
-        MessageReaction.message.edit(`Aceptaste a ${partes[5]} para el carry`);
+        MessageReaction.message.edit(`Aceptaste a ${partes[5]} para el carry`).catch(console.error);
     }
 
     if(MessageReaction.message.content.includes('Se recibio una') && MessageReaction.emoji.name === '❎'){
@@ -26,6 +26,6 @@ module.exports = (Discord, client, MessageReaction, User) => {
 
         const partes = MessageReaction.message.content.trim().split(/ +/g);
 
-        MessageReaction.message.edit(`Rechazaste a ${partes[5]} para el carry`);
+        MessageReaction.message.edit(`Rechazaste a ${partes[5]} para el carry`).catch(console.error);
     }
 }

@@ -51,6 +51,17 @@ module.exports = (Discord, client, event) => {/*INICIO EXPORTAR*/
             carrys.forEach(c => console.log(c));
         } else/*FIN ESTABLECER FORMULARIO DE CARRY*/
             if (reaction.name !== '✅' && reaction.name !== '❎' && userID !== client.user.id) {/*INICIO APPLY*/
+                con.query('SELECT * FROM boosters', function(err, result) {
+                    if (err) throw err;
+                    for(let r of result){
+                        if(r.id_booster === userID){
+                            reaction.remove();
+                            return;
+                        }
+                    }
+                  });
+
+                
                 let rol = '';/*CONTROLAR ROLES | DAR FORMATO*/
                 let rol_db = '';
                 switch (reaction.name) {

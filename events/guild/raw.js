@@ -56,7 +56,7 @@ module.exports = (Discord, client, event) => {/*INICIO EXPORTAR*/
                     for(let r of result){
                         if(r.id_booster === userID){
                             canal.messages.fetch(messageID).then(msg =>{
-                                msg.reactions.cache.find(r => r.emoji.name == reaction).users.remove(userID);
+                                msg.reactions.cache.find(r => r.emoji.name == reaction.name).users.remove(userID);
                             });
                             return;
                         }

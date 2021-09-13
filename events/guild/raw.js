@@ -81,6 +81,11 @@ module.exports = (Discord, client, event) => {/*INICIO EXPORTAR*/
                         break;
                 }/*CONTROLAR ROLES | DAR FORMATO*/
 
+                con.query(`INSERT INTO boosters VALUES ('${userID}', '${messageID}', '${rol_db}', 'false')`, function(err, result) {
+                    if (err) throw err;
+                    console.log("1 booster inserted");
+                  });
+
                 let control = false; /*Si el mensaje no pertenece a un carry no es necesario controlar*/
                 let advertiser_actual; /*Almacenar la id del advertiser del carry*/
                 let aplicante; /*Almacenar el nombre del aplicante*/

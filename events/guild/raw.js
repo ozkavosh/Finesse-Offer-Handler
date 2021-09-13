@@ -1,6 +1,20 @@
 var carrys = []; /*VECTOR DE CARRYS*/
 var advertiser_id = ''; /*ID DEL CREADOR DEL FORMULARIO*/
 
+const mysql = require('mysql');
+    var con = mysql.createConnection({
+      host: "sql10.freemysqlhosting.net",
+      user: "sql10436751",
+      password: "IKvPdz4fKe",
+      port: "3306",
+      database: "sql10436751",
+      supportBigNumbers: "true"
+    });
+
+    con.connect(function(err) {
+      if (err) throw err;
+    });
+
 module.exports = (Discord, client, event) => {/*INICIO EXPORTAR*/
 
     if (event.t === 'MESSAGE_CREATE' && event.d.content.startsWith('-set_carry')) {/*INICIO VERIFICAR MENSAJE*/
@@ -29,6 +43,8 @@ module.exports = (Discord, client, event) => {/*INICIO EXPORTAR*/
             return;
         }/*CONTROLAR EMOJIS ACEPTADOS */
 
+        var aceptado = 0;
+
         if (reaction.name === 'dps' && userID === client.user.id) {/*INICIO ESTABLECER FORMULARIO DE CARRY*/
             carrys.push(({ advertiser: `${advertiser_id}`, embedID: `${messageID}`, finalizado: false }));
             console.log('Carrys cargados actualmente:');
@@ -36,14 +52,19 @@ module.exports = (Discord, client, event) => {/*INICIO EXPORTAR*/
         } else/*FIN ESTABLECER FORMULARIO DE CARRY*/
             if (reaction.name !== '✅' && reaction.name !== '❎' && userID !== client.user.id) {/*INICIO APPLY*/
                 let rol = '';/*CONTROLAR ROLES | DAR FORMATO*/
+                let rol_db = '';
                 switch (reaction.name) {
                     case 'dps': rol = `<:dps:884119963571458068> DPS`;
+                                rol_db = 'DPS';
                         break;
                     case 'heal': rol = `<:heal:884119949776420895> HEAL`;
+                                 rol_db = 'HEAL';
                         break;
                     case 'tank': rol = `<:tank:884119949512175647> TANK`;
+                                 rol_db = 'TANK';
                         break;
                     case 'chest1': rol = `<:chest1:884474242605908090> FUNNEL`;
+                                   rol_db = 'FUNNEL';
                         break;
                 }/*CONTROLAR ROLES | DAR FORMATO*/
 

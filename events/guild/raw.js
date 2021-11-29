@@ -1,21 +1,122 @@
 var carrys = []; /*VECTOR DE CARRYS*/
 var advertiser_id = ''; /*ID DEL CREADOR DEL FORMULARIO*/
-
+var weas = {
+  verificado: true
+};
 const mysql = require('mysql');
-    var con = mysql.createConnection({
-      host: "sql10.freemysqlhosting.net",
-      user: "sql10436751",
-      password: "IKvPdz4fKe",
+
+function obtener_boosters(callback){
+  var con = mysql.createConnection({
+      host: "db4free.net",
+      user: "ozkavosh",
+      password: "66a46dd7",
       port: "3306",
-      database: "sql10436751",
-      supportBigNumbers: "true"
+      database: "finessedb"
+  });
+
+  con.connect(function(err) {
+    if (err) throw err;
+  });
+
+  con.query('SELECT * FROM boosters', function(err, result) {
+      if (err){
+        callback(err, null);
+      }else{
+        callback(null, result);
+      }
+  });
+
+  con.end();
+}
+
+function obtener_carrys(callback){
+  var con = mysql.createConnection({
+      host: "db4free.net",
+      user: "ozkavosh",
+      password: "66a46dd7",
+      port: "3306",
+      database: "finessedb"
+  });
+
+  con.connect(function(err) {
+    if (err) throw err;
+  });
+
+  con.query('SELECT * FROM carrys', function(err, result) {
+      if (err){
+        callback(err, null);
+      }else{
+        callback(null, result);
+      }
+  });
+
+  con.end();
+}
+
+function cargar_booster(userID, messageID, rol_db, estado){
+    const mysql = require('mysql');
+    var con = mysql.createConnection({
+      host: "db4free.net",
+      user: "ozkavosh",
+      password: "66a46dd7",
+      port: "3306",
+      database: "finessedb"
     });
 
     con.connect(function(err) {
       if (err) throw err;
     });
 
-module.exports = (Discord, client, event) => {/*INICIO EXPORTAR*/
+    con.query(`INSERT INTO boosters VALUES ('${userID}', '${messageID}', '${rol_db}', '${estado}', DEFAULT)`, function(err, result) {
+        if (err) throw err;
+        console.log("1 booster inserted");
+    });
+    con.end();
+}
+
+function finalizar_carrys(carry){
+    const mysql = require('mysql');
+    var con = mysql.createConnection({
+      host: "db4free.net",
+      user: "ozkavosh",
+      password: "66a46dd7",
+      port: "3306",
+      database: "finessedb"
+    });
+
+    con.connect(function(err) {
+      if (err) throw err;
+    });
+
+    con.query(`DELETE FROM carrys WHERE id_carry = ${carry}`, function(err, result) {
+        if (err) throw err;
+        console.log("Se borro un carry");
+    });
+    con.end();
+}
+
+function limpiar_boosters(carry){
+    const mysql = require('mysql');
+    var con = mysql.createConnection({
+      host: "db4free.net",
+      user: "ozkavosh",
+      password: "66a46dd7",
+      port: "3306",
+      database: "finessedb"
+    });
+
+    con.connect(function(err) {
+      if (err) throw err;
+    });
+
+    con.query(`DELETE FROM boosters WHERE id_carry = ${carry}`, function(err, result) {
+        if (err) throw err;
+        console.log("Se borro un carry");
+    });
+    con.end();
+}
+
+module.exports = async (Discord, client, event) => {/*INICIO EXPORTAR*/
 
     if (event.t === 'MESSAGE_CREATE' && event.d.content.startsWith('-set_carry')) {/*INICIO VERIFICAR MENSAJE*/
         advertiser_id = event.d.author.id;
@@ -51,19 +152,16 @@ module.exports = (Discord, client, event) => {/*INICIO EXPORTAR*/
             carrys.forEach(c => console.log(c));
         } else/*FIN ESTABLECER FORMULARIO DE CARRY*/
             if (reaction.name !== '✅' && reaction.name !== '❎' && userID !== client.user.id) {/*INICIO APPLY*/
-                con.query('SELECT * FROM boosters', function(err, result) {
-                    if (err) throw err;
-                    for(let r of result){
-                        if(r.id_booster === userID){
-                            canal.messages.fetch(messageID).then(msg =>{
-                                msg.reactions.cache.find(r => r.emoji.name == reaction.name).users.remove(userID);
-                            });
-                            return;
-                        }
-                    }
-                  });
+                obtener_boosters(function(err, rows){
+                  if (err) {
+                    // error handling code goes here
+                  console.log("ERROR : ",err);            
+                  } else {            
+                    // code to execute on data retrieval
+                    console.log("result from db is : ", rows);   
+                  } 
+                });
 
-                
                 let rol = '';/*CONTROLAR ROLES | DAR FORMATO*/
                 let rol_db = '';
                 switch (reaction.name) {
@@ -81,15 +179,12 @@ module.exports = (Discord, client, event) => {/*INICIO EXPORTAR*/
                         break;
                 }/*CONTROLAR ROLES | DAR FORMATO*/
 
-                con.query(`INSERT INTO boosters VALUES ('${userID}', '${messageID}', '${rol_db}', 'false')`, function(err, result) {
-                    if (err) throw err;
-                    console.log("1 booster inserted");
-                  });
-
                 let control = false; /*Si el mensaje no pertenece a un carry no es necesario controlar*/
                 let advertiser_actual; /*Almacenar la id del advertiser del carry*/
                 let aplicante; /*Almacenar el nombre del aplicante*/
                 let aplicante_id; /*Almacenar la id del aplicante*/
+
+                cargar_booster(userID, messageID, rol_db, 0);
 
                 for (let c of carrys) {/*CONTROLAR QUE EL MENSAJE PERTENEZCA A UN FORMULARIO DE CARRY*/
                     if (c.embedID === messageID && !c.finalizado) {
@@ -113,7 +208,7 @@ module.exports = (Discord, client, event) => {/*INICIO EXPORTAR*/
                     user.send(`Se recibio una solicitud de ${aplicante} ${aplicante_id} como ${rol}`).then(dm => {
                         dm.react("✅");
                         dm.react("❎");
-                    });
+                    }).catch(console.error);
                 }).catch(console.error);
                 /*ENVIO DE MENSAJES DIRECTOS*/
 
@@ -140,6 +235,9 @@ module.exports = (Discord, client, event) => {/*INICIO EXPORTAR*/
                         msg.edit({embeds: [editEmbed]});
                         msg.reactions.removeAll();
                 });
+
+                finalizar_carrys(messageID);
+                limpiar_boosters(messageID);
             }/*FIN COMPLETAR CARRY*/
             if(reaction.name === '❎'){/*INICIO CANCELAR CARRY*/
                 let control = false;
@@ -165,6 +263,9 @@ module.exports = (Discord, client, event) => {/*INICIO EXPORTAR*/
 
                         c.finalizado = true;
                 });
+
+                finalizar_carrys(messageID);
+                limpiar_boosters(messageID);
             }/*FIN CANCELAR CARRY*/
 
     }/*FIN CONTROL DE REACCIONES*/

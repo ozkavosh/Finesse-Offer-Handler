@@ -1,3 +1,25 @@
+function cargar_carry(id_embed, id_advertiser, tipo_carry, estado){
+    const mysql = require('mysql');
+    var con = mysql.createConnection({
+      host: "db4free.net",
+      user: "ozkavosh",
+      password: "66a46dd7",
+      port: "3306",
+      database: "finessedb"
+    });
+
+    con.connect(function(err) {
+      if (err) throw err;
+    });
+
+    var sql = `INSERT INTO carrys VALUES ('${id_embed}', '${id_advertiser}', '${tipo_carry}', '${estado}')`;
+        con.query(sql, function(err, result) {
+        if (err) throw err;
+          console.log("1 carry inserted");
+    });
+    con.end();
+}
+
 module.exports = {/*Inicio export*/
   name: 'set_carry',
   description: 'Crea un formulario de boosteo',
@@ -7,20 +29,6 @@ module.exports = {/*Inicio export*/
         return;
       }
     }
-
-    const mysql = require('mysql');
-    var con = mysql.createConnection({
-      host: "sql10.freemysqlhosting.net",
-      user: "sql10436751",
-      password: "IKvPdz4fKe",
-      port: "3306",
-      database: "sql10436751"
-    });
-
-    con.connect(function(err) {
-      if (err) throw err;
-      console.log("Connected!");
-    });
 
     var id_advertiser, id_embed, carry_tipo, finalizado;
 
@@ -67,16 +75,11 @@ module.exports = {/*Inicio export*/
         embedMessage.react("884474242605908090");
         embedMessage.react("✅");
         embedMessage.react("❎");
+
         id_embed = embedMessage.id;
 
-        var sql = `INSERT INTO carrys VALUES ('${id_embed}', '${id_advertiser}', '${tipo_carry}', '${finalizado}')`;
-        con.query(sql, function(err, result) {
-          if (err) throw err;
-          console.log("1 carry inserted");
-        });
-        con.end();
+        cargar_carry(id_embed, id_advertiser, tipo_carry, finalizado);
 
       });/*Fin formulario enviado*/
-
   }/*Fin ejecutar comando*/
 }/*Fin export*/

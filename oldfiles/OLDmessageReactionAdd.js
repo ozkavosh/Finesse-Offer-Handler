@@ -1,26 +1,3 @@
-const mysql = require('mysql');
-
-function modificar_booster(booster, rol){
-    const mysql = require('mysql');
-    var con = mysql.createConnection({
-      host: "db4free.net",
-      user: "ozkavosh",
-      password: "66a46dd7",
-      port: "3306",
-      database: "finessedb"
-    });
-
-    con.connect(function(err) {
-      if (err) throw err;
-    });
-
-    con.query(`UPDATE boosters SET estado = 1 WHERE id_us = ${booster} AND rol = "${rol}"`, function(err, result) {
-        if (err) throw err;
-        console.log("se acepto un booster");
-    });
-    con.end();
-}
-
 module.exports = (Discord, client, MessageReaction, User) => {
     if (MessageReaction.message.reactions.cache.size > 6 && MessageReaction.message.author.id === client.user.id){
         MessageReaction.remove();
@@ -46,8 +23,6 @@ module.exports = (Discord, client, MessageReaction, User) => {
                         break;
             }
         }
-
-        modificar_booster(partes[6], partes[9]);
 
         client.users.fetch(partes[6]).then(usuario => {
             usuario.send(`Fuiste aceptado para el carry ! Tu rol es: ${partes[8]} ${partes[9]}`).catch(console.error);

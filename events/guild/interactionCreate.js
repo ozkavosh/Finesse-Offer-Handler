@@ -13,7 +13,12 @@ module.exports = async (Discord, client, interaction) => {
     }
   }
 
-  nombre = interaction.user.username;
+  try{
+    nombre = interaction.member.displayName;
+  }catch{
+    nombre = interaction.user.username;
+  }
+  
   id = interaction.user.id;
   carry = interaction.message.id;
 
@@ -27,25 +32,17 @@ module.exports = async (Discord, client, interaction) => {
     }
   }
 
-  if(interaction.isButton() && interaction['customId'] == 'finalizar'){
-    let bool = false;
-    for(let c of listas.carrys){
-      if(c.id == carry && c.advertiser_id == id){
-        bool = true;
-      }
-    }
-    if(bool){
+  if(interaction.isButton() && interaction['customId'] == 'finalizar' && (interaction.user.id == '237390277558403074' || interaction.member.roles.cache.has('881942073178202112'))){
       const msg_finalizado = new Discord.MessageEmbed(interaction.message.embeds[0])
               .setTitle('Finalizado. Gracias por aplicar!')
               .setColor('#006622')
               .setDescription(`Ya no se aceptan mas aplicaciones.`)
-              .setFooter(`${id}`);
+              .setFooter(`${carry}`);
 
       interaction.message.edit({embeds: [msg_finalizado], components: []});
       listas.carrys = [];
       listas.boosters = [];
-    }
-    interaction.deferUpdate();
+      interaction.deferUpdate();
   }
 
   if (interaction.isSelectMenu() && interaction['customId'] == 'rol') {
@@ -109,7 +106,7 @@ module.exports = async (Discord, client, interaction) => {
               .setAuthor(nombre, interaction.user.avatarURL({ dynamic: true }))
               .setDescription(`Se recibio correctamente tu solicitud como ${rol}! en caso de ser aceptado serás notificado.`)
               .setThumbnail('https://finesseguild.online/img/logo.png')
-              .setFooter(`${id}`);
+              .setFooter(`${carry}`);
 
       interaction.user.send({embeds: [msg_exito]});
 
@@ -126,7 +123,7 @@ module.exports = async (Discord, client, interaction) => {
                 { name: 'Rol:', value: `${rol}`, inline: false },
                 { name: 'Funnel:', value: `${funnel}`, inline: false }
               )
-              .setFooter(`${id}`);
+              .setFooter(`${carry}`);
 
             const botones = new Discord.MessageActionRow().addComponents(
               new Discord.MessageButton()
@@ -154,7 +151,7 @@ module.exports = async (Discord, client, interaction) => {
                 { name: 'Rol:', value: `${rol}`, inline: false },
                 { name: 'Funnel:', value: `${funnel}`, inline: false }
               )
-              .setFooter(`${id}`);
+              .setFooter(`${carry}`);
 
               const btn_aceptado = new Discord.MessageActionRow().addComponents(
               new Discord.MessageButton()
@@ -176,13 +173,15 @@ module.exports = async (Discord, client, interaction) => {
                 if (btn.customId === 'aceptar') {
 		              interaction.user.send({embeds: [msg_aceptado]});
                   await btn.update({components: [btn_aceptado]})
+                  console.log(`${nombre} fue aceptado para el carry`);
 	              } else {
-		              await btn.update({components: [btn_rechazado]})
+		              await btn.update({components: [btn_rechazado]});
+                  console.log(`${nombre} fue rechazado para el carry`);
 	              }
                 col.stop();
               });
 
-              col.on('end', collected => console.log(`Collected ${col.size} items`));
+              col.on('end', collected => console.log(`Finalizo el collector de ${nombre}`));
             }).catch(console.error);
           }).catch(console.error);
         }

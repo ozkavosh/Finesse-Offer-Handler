@@ -1,4 +1,5 @@
 var listas = require('../../listas.js');
+const fs = require('fs');
 let nombre = "";
 let id = "";
 let carry = "";
@@ -40,8 +41,35 @@ module.exports = async (Discord, client, interaction) => {
               .setFooter(`${carry}`);
 
       interaction.message.edit({embeds: [msg_finalizado], components: []});
-      listas.carrys = [];
-      listas.boosters = [];
+
+      //Borrar carry
+      let carrys_nuevo = [];
+
+      for(let c of listas.carrys){
+        if(c.id !== interaction.message.id){
+          carrys_nuevo.push(c);
+        }
+      }
+
+      listas.carrys = carrys_nuevo;
+
+      //Borrar boosters del carry
+      let boosters_nuevo = [];
+
+      for(let b of listas.boosters){
+        if(b.carry !== interaction.message.id){
+          boosters_nuevo.push(b);
+        }
+      }
+
+      listas.boosters = boosters_nuevo;
+
+      let json = JSON.stringify(listas.carrys); //convert it back to json
+      fs.writeFile('carrys.json', json, 'utf8', function(err) {
+          if (err) throw err;
+          console.log('> Se finalizo un carry <');
+      });
+
       interaction.deferUpdate();
   }
 
@@ -173,15 +201,15 @@ module.exports = async (Discord, client, interaction) => {
                 if (btn.customId === 'aceptar') {
 		              interaction.user.send({embeds: [msg_aceptado]});
                   await btn.update({components: [btn_aceptado]})
-                  console.log(`${nombre} fue aceptado para el carry`);
+                  console.log(`${interaction.user.username} fue aceptado para el carry`);
 	              } else {
 		              await btn.update({components: [btn_rechazado]});
-                  console.log(`${nombre} fue rechazado para el carry`);
+                  console.log(`${interaction.user.username} fue rechazado para el carry`);
 	              }
                 col.stop();
               });
 
-              col.on('end', collected => console.log(`Finalizo el collector de ${nombre}`));
+              col.on('end', collected => console.log(`Finalizo el collector de ${interaction.user.username}`));
             }).catch(console.error);
           }).catch(console.error);
         }

@@ -1,4 +1,6 @@
 var listas = require('../listas.js');
+var fs = require('fs');
+var json = JSON.stringify(listas.carrys);
 
 module.exports = {/*Inicio export*/
   name: 'set_carry',
@@ -179,6 +181,13 @@ module.exports = {/*Inicio export*/
         id_embed = embedMessage.id;
 
         listas.carrys.push({ id: `${id_embed}`, advertiser_id: `${id_advertiser}` });
+
+        json = JSON.stringify(listas.carrys); //convert it back to json
+        fs.writeFile('carrys.json', json, 'utf8', function(err) {
+          if (err) throw err;
+          console.log('> Se creo un carry <');
+        });
+
       });/*Fin formulario enviado*/
   }/*Fin ejecutar comando*/
 }/*Fin export*/

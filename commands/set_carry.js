@@ -180,6 +180,10 @@ module.exports = {/*Inicio export*/
       .then(embedMessage => {/*Inicio formulario enviado*/
         id_embed = embedMessage.id;
 
+        const embedConId = new Discord.MessageEmbed(embedMessage.embeds[0]).setFooter(`ID Carry: ${id_embed}`);
+
+        embedMessage.edit({embeds: [embedConId]});
+
         listas.carrys.push({ id: `${id_embed}`, advertiser_id: `${id_advertiser}` });
 
         json = JSON.stringify(listas.carrys); //convert it back to json

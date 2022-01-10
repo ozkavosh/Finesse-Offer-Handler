@@ -8,18 +8,18 @@ let clase = "";
 let funnel = "";
 
 module.exports = async (Discord, client, interaction) => {
-  if(!interaction.isSelectMenu()){
-    if(!interaction.isButton()){
+  if (!interaction.isSelectMenu()) {
+    if (!interaction.isButton()) {
       return;
     }
   }
 
-  try{
+  try {
     nombre = interaction.member.displayName;
-  }catch{
+  } catch{
     nombre = interaction.user.username;
   }
-  
+
   id = interaction.user.id;
   carry = interaction.message.id;
 
@@ -33,44 +33,59 @@ module.exports = async (Discord, client, interaction) => {
     }
   }
 
-  if(interaction.isButton() && interaction['customId'] == 'finalizar' && (interaction.user.id == '237390277558403074' || interaction.member.roles.cache.has('881942073178202112'))){
-      const msg_finalizado = new Discord.MessageEmbed(interaction.message.embeds[0])
-              .setTitle('Finalizado. Gracias por aplicar!')
-              .setColor('#006622')
-              .setDescription(`Ya no se aceptan mas aplicaciones.`)
-              .setFooter(`${carry}`);
+  if (interaction.isButton() && interaction['customId'] == 'finalizar' && (interaction.user.id == '237390277558403074' || interaction.member.roles.cache.has('881942073178202112'))) {
+    const msg_finalizado = new Discord.MessageEmbed(interaction.message.embeds[0])
+      .setTitle('Finalizado. Gracias por aplicar!')
+      .setColor('#006622')
+      .setDescription(`Ya no se aceptan mas aplicaciones.`)
+      .setFooter(`ID Carry: ${carry}`);
 
-      interaction.message.edit({embeds: [msg_finalizado], components: []});
+    interaction.message.edit({ embeds: [msg_finalizado], components: [] });
 
-      //Borrar carry
-      let carrys_nuevo = [];
+    //Borrar carry
+    let carrys_nuevo = [];
 
-      for(let c of listas.carrys){
-        if(c.id !== interaction.message.id){
-          carrys_nuevo.push(c);
-        }
+    for (let c of listas.carrys) {
+      if (c.id !== interaction.message.id) {
+        carrys_nuevo.push(c);
       }
+    }
 
-      listas.carrys = carrys_nuevo;
+    listas.carrys = carrys_nuevo;
 
-      //Borrar boosters del carry
-      let boosters_nuevo = [];
+    //Borrar boosters del carry
+    let boosters_nuevo = [];
 
-      for(let b of listas.boosters){
-        if(b.carry !== interaction.message.id){
-          boosters_nuevo.push(b);
-        }
+    for (let b of listas.boosters) {
+      if (b.carry !== interaction.message.id) {
+        boosters_nuevo.push(b);
       }
+    }
 
-      listas.boosters = boosters_nuevo;
+    listas.boosters = boosters_nuevo;
 
-      let json = JSON.stringify(listas.carrys); //convert it back to json
-      fs.writeFile('carrys.json', json, 'utf8', function(err) {
-          if (err) throw err;
-          console.log('> Se finalizo un carry <');
-      });
+    //Borrar aplicantes del carry
+    let aplicantes_nuevo = [];
 
-      interaction.deferUpdate();
+    for (let a of listas.aplicantes) {
+      if (a.test_carryId !== interaction.message.id) {
+        aplicantes_nuevo.push(a);
+      }
+    }
+
+    listas.aplicantes = aplicantes_nuevo;
+
+    fs.writeFile('carrys.json', JSON.stringify(listas.carrys), 'utf8', function(err) {
+      if (err) throw err;
+      console.log('> Se finalizo un carry <');
+    });
+
+    fs.writeFile('aplicantes.json', JSON.stringify(listas.aplicantes), 'utf8', function(err) {
+      if (err) throw err;
+      console.log('> Se finalizo un carry <');
+    });
+
+    interaction.deferUpdate();
   }
 
   if (interaction.isSelectMenu() && interaction['customId'] == 'rol') {
@@ -129,14 +144,14 @@ module.exports = async (Discord, client, interaction) => {
       interaction.user.send({ ephemeral: true, content: "No se seleccionaron todas las opciones!" });
     } else {
       const msg_exito = new Discord.MessageEmbed()
-              .setTitle('Apply enviado con éxito')
-              .setColor('#660000')
-              .setAuthor(nombre, interaction.user.avatarURL({ dynamic: true }))
-              .setDescription(`Se recibio correctamente tu solicitud como ${rol}! en caso de ser aceptado serás notificado.`)
-              .setThumbnail('https://finesseguild.online/img/logo.png')
-              .setFooter(`${carry}`);
+        .setTitle('Apply enviado con éxito')
+        .setColor('#660000')
+        .setAuthor(nombre, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Se recibió correctamente tu solicitud como ${rol}! En caso de ser aceptado serás notificado.`)
+        .setThumbnail('https://finesseguild.online/img/logo.png')
+        .setFooter(`${carry}`);
 
-      interaction.user.send({embeds: [msg_exito]});
+      interaction.user.send({ embeds: [msg_exito] });
 
       for (let c of listas.carrys) {
         if (c.id == carry) {
@@ -151,7 +166,9 @@ module.exports = async (Discord, client, interaction) => {
                 { name: 'Rol:', value: `${rol}`, inline: false },
                 { name: 'Funnel:', value: `${funnel}`, inline: false }
               )
-              .setFooter(`${carry}`);
+              .setFooter(`ID Carry: ${carry}`);
+
+            let test_booster = { test_id: id, test_clase: clase, test_rol: rol, test_funnel: funnel, test_applyId: 0, test_carryId: carry, aceptado: 0 };
 
             const botones = new Discord.MessageActionRow().addComponents(
               new Discord.MessageButton()
@@ -166,57 +183,67 @@ module.exports = async (Discord, client, interaction) => {
 
             //Mensaje al advertiser
             user.send({ embeds: [apply], components: [botones] }).then(dm => {
-              const col = dm.createMessageComponentCollector({componentType: 'BUTTON', time: 18000000});
+              test_booster.test_applyId = dm.id;
+              listas.aplicantes.push(test_booster);
 
-              const msg_aceptado = new Discord.MessageEmbed()
-              .setTitle('Fuiste aceptado para el carry!')
-              .setColor('#660000')
-              .setAuthor(nombre, interaction.user.avatarURL({ dynamic: true }))
-              .setDescription('Felicidades has sido aceptado para el carry, ante cualquier novedad mantente atento del canal de anuncios!')
-              .setThumbnail('https://finesseguild.online/img/logo.png')
-              .addFields(
-                { name: 'Clase:', value: `${clase}`, inline: false },
-                { name: 'Rol:', value: `${rol}`, inline: false },
-                { name: 'Funnel:', value: `${funnel}`, inline: false }
-              )
-              .setFooter(`${carry}`);
-
-              const btn_aceptado = new Discord.MessageActionRow().addComponents(
-              new Discord.MessageButton()
-                .setCustomId('aceptado')
-                .setLabel('Aceptado')
-                .setStyle('SUCCESS')
-                .setDisabled(true)
-            )
-
-            const btn_rechazado = new Discord.MessageActionRow().addComponents(
-              new Discord.MessageButton()
-                .setCustomId('rechazado')
-                .setLabel('Rechazado')
-                .setStyle('DANGER')
-                .setDisabled(true)
-            )
-
-              col.on('collect', async btn => {
-                if (btn.customId === 'aceptar') {
-		              interaction.user.send({embeds: [msg_aceptado]});
-                  await btn.update({components: [btn_aceptado]})
-                  console.log(`${interaction.user.username} fue aceptado para el carry`);
-	              } else {
-		              await btn.update({components: [btn_rechazado]});
-                  console.log(`${interaction.user.username} fue rechazado para el carry`);
-	              }
-                col.stop();
+              fs.writeFile('aplicantes.json', JSON.stringify(listas.aplicantes), function(err) {
+                if (err) throw err;
+                console.log(">Se agrego un aplicante<")
               });
-
-              col.on('end', collected => console.log(`Finalizo el collector de ${interaction.user.username}`));
-            }).catch(console.error);
-          }).catch(console.error);
+            });
+          });
         }
       }
     }
-    console.log(listas.boosters);
-
     interaction.deferUpdate();
   }
+
+  if (interaction.isButton() && interaction['customId'] == 'aceptar') {
+        const btn_aceptado = new Discord.MessageActionRow().addComponents(
+          new Discord.MessageButton()
+            .setCustomId('aceptado')
+            .setLabel('Aceptado')
+            .setStyle('SUCCESS')
+            .setDisabled(true)
+        )
+
+        const btn_rechazado = new Discord.MessageActionRow().addComponents(
+          new Discord.MessageButton()
+            .setCustomId('rechazado')
+            .setLabel('Rechazado')
+            .setStyle('DANGER')
+            .setDisabled(true)
+        )
+
+        for (let a of listas.aplicantes) {
+          if (a.test_applyId == interaction.message.id) {
+            client.users.fetch(a.test_id).then(async (aplicante) => {
+
+              const msg_aceptado = new Discord.MessageEmbed()
+          .setTitle('Fuiste aceptado para el carry!')
+          .setColor('#660000')
+          .setAuthor(aplicante.username, aplicante.avatarURL({ dynamic: true }))
+          .setDescription('Felicidades has sido aceptado para el carry, ante cualquier novedad mantente atento del canal de anuncios!')
+          .setThumbnail('https://finesseguild.online/img/logo.png')
+          .addFields(
+            { name: 'Clase:', value: `${a.test_clase}`, inline: false },
+            { name: 'Rol:', value: `${a.test_rol}`, inline: false },
+            { name: 'Funnel:', value: `${a.test_funnel}`, inline: false }
+          )
+          .setFooter(`ID Carry: ${a.test_carryId}`);
+              a.aceptado = 1;
+              fs.writeFile('aplicantes.json', JSON.stringify(listas.aplicantes), function(err) {
+                if (err) throw err;
+                console.log(`${aplicante.username} fue aceptado para el carry`);
+              });
+              aplicante.send({embeds: [msg_aceptado]});
+            });
+            
+            interaction.update({ embeds: [interaction.message.embeds[0]], components: [btn_aceptado] });
+            break;
+          }
+        }
+      } else if (interaction['customId'] == 'rechazado') {
+             interaction.update({ embeds: [interaction.message.embeds[0]], components: [btn_rechazado] });
+      }
 }

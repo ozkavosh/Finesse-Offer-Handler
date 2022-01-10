@@ -12,5 +12,10 @@ module.exports = (Discord, client) => {
   if(err) throw err;
   listas.carrys = JSON.parse(content);
   });
+
+  fs.readFile('aplicantes.json',function(err,content){
+  if(err) throw err;
+  listas.aplicantes = JSON.parse(content);
+  });
 }
     

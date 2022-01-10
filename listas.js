@@ -1,4 +1,5 @@
 module.exports = {
   boosters : [],
-  carrys : []
+  carrys : [],
+  aplicantes : []
 }
